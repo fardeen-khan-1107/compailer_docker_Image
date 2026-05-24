@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Compiler Test</title>
+</head>
+
+<body>
+
+    <h2>Code</h2>
+    <textarea id="code" rows="10" cols="50"></textarea>
+
+    <br><br>
+
+    <select id="language">
+        <option value="python">Python</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="java">Java</option>
+        <option value="sql">SQL</option>
+    </select>
+    <br><br>
+
+    <button onclick="runCode()">Run</button>
+
+    <br><br>
+
+    <h3>Input</h3>
+    <input id="inputBox" placeholder="Enter input" />
+    <button onclick="sendInput()">Send Input</button>
+
+    <h3>Output</h3>
+    <pre id="output"></pre>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <script>
+        const socket = io("http://localhost:5000");
+
+        function runCode() {
+            document.getElementById("output").innerText = "";
+
+            socket.emit("run-code", {
+                code: document.getElementById("code").value,
+                language: document.getElementById("language").value
+            });
+        }
+
+        function sendInput() {
+            const input = document.getElementById("inputBox").value;
+            socket.emit("input", input);
+            document.getElementById("inputBox").value = "";
+        }
+
+        socket.on("output", (data) => {
+            document.getElementById("output").innerText += data;
+        });
+    </script>
+
+</body>
+
+</html>
