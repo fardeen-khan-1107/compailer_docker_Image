@@ -6,7 +6,7 @@ const { Server } = require("socket.io");
 const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { v4: uuidv4 } = require("uuid");
+//const { v4: uuidv4 } = require("uuid");
 
 dotenv.config();
 
@@ -49,12 +49,13 @@ io.on("connection", (socket) => {
       if (childProcess) {
         try {
           childProcess.kill("SIGKILL");
-        } catch (e) {}
+        } catch (e) { }
         childProcess = null;
       }
 
       // Create a unique subdirectory for this execution (fixes Java concurrency + isolation)
-      const execId = uuidv4();
+      //const execId = uuidv4();
+      const execId = Date.now().toString();
       execDir = path.join(tempDir, execId);
       fs.mkdirSync(execDir, { recursive: true });
 
@@ -202,6 +203,7 @@ io.on("connection", (socket) => {
       childProcess.on("close", (exitCode) => {
         clearTimeout(timeout);
         console.log(`⚡ Process finished (exit code: ${exitCode})`);
+        socket.emit("finished", exitCode);
         childProcess = null;
 
         // 🧹 Cleanup the unique execution directory
@@ -242,20 +244,20 @@ io.on("connection", (socket) => {
     if (childProcess) {
       try {
         childProcess.kill("SIGKILL");
-      } catch (e) {}
+      } catch (e) { }
     }
     // Cleanup exec dir on disconnect
     if (execDir && fs.existsSync(execDir)) {
       try {
         fs.rmSync(execDir, { recursive: true, force: true });
-      } catch (e) {}
+      } catch (e) { }
     }
     // Cleanup user persistent dir
     const userDir = path.join(tempDir, socket.id);
     if (fs.existsSync(userDir)) {
       try {
         fs.rmSync(userDir, { recursive: true, force: true });
-      } catch (e) {}
+      } catch (e) { }
     }
   });
 });
