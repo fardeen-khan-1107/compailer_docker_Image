@@ -7,10 +7,12 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     gcc \
     g++ \
-    openjdk-17-jdk \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install numpy pandas matplotlib scikit-learn
+RUN pip3 install --no-cache-dir \
+    numpy \
+    pandas \
+    matplotlib
 
 WORKDIR /app
