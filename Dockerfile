@@ -8,11 +8,18 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     sqlite3 \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir \
-    numpy \
-    pandas \
-    matplotlib
+RUN pip3 install --no-cache-dir numpy pandas matplotlib
 
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+EXPOSE 5000
+
+CMD ["npm", "start"]
